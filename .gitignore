@@ -1,0 +1,21 @@
+# Dependências e caches
+node_modules/
+.cache/
+coverage/
+
+# Configurações locais e credenciais
+.env
+.env.*
+!.env.example
+.aws/
+.codex/
+.agents/
+
+# Arquivos temporários e de editores
+*.log
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
