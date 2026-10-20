@@ -30,9 +30,9 @@ export const site = {
   },
   "shop": {
     "kicker": "OBJETOS DO DIA A DIA",
-    "title": "Canecas e cerâmicas para o cotidiano.",
-    "description": "Conheça as peças da vitrine e explore as formas, os usos e os materiais.",
-    "catalogNote": "Vitrine demonstrativa. Produtos e preços de exemplo."
+    "title": "Café com posição.",
+    "description": "Caneca Capitalismo Depressão. Sem estoque no momento.",
+    "catalogNote": "Sem pagamento nem garantia de unidade."
   },
   "closing": {
     "title": "Seu corpo tem voz.",
@@ -42,11 +42,6 @@ export const site = {
   "footer": {
     "tagline": "Yoga, autonomia e resistência.",
     "location": "Da Bahia, para a vida concreta."
-  },
-  "cart": {
-    "kicker": "VITRINE DEMONSTRATIVA",
-    "emptyTitle": "Seu carrinho está vazio.",
-    "summaryTitle": "Resumo da simulação."
   }
 },
  manifesto: {
@@ -79,6 +74,18 @@ export const site = {
  'Isso não significa "corrigir a postura" ou encontrar uma posição perfeita para o corpo. O principal benefício parece estar na ampliação do repertório de movimentos e na interrupção de períodos prolongados de imobilidade.',
  'Para quem passa o dia sentado, o yoga pode funcionar como um momento de movimento deliberado em uma rotina marcada pela permanência na mesma posição.'
  ]}],
- products:[{id:'caneca',name:'Caneca Aurora',note:'Caneca ilustrativa em dois tons.',price:89,image:'/assets/illustrations/caneca.svg'}, {id:'xicara',name:'Xícara Terra',note:'Xícara ilustrativa com pires.',price:65,image:'/assets/illustrations/xicara.svg'}, {id:'vaso',name:'Vaso Essência',note:'Vaso ilustrativo de formato arredondado.',price:110,image:'/assets/illustrations/vaso.svg'}]
+ interestForm: {
+  url: 'https://docs.google.com/forms/d/e/1FAIpQLSeGooFPhxoqhXEbvQHcH3LshIzqEHd0BzHju4kYydiqIfVBPA/viewform?usp=dialog',
+  notice: 'Seus dados serão usados por Letícia para entrar em contato sobre a disponibilidade desta caneca. O cadastro não envolve pagamento nem garante uma unidade.'
+ },
+ products:[{
+  id:'caneca-capitalismo-depressao',name:'Caneca Capitalismo Depressão',price:70,
+  image:'/assets/products/Caneca_Capitalismo_Depressão.jpeg',status:'Sem estoque',
+  description:[
+   'Doze horas de trabalho, o dono ficando milionário e a cobrança para você continuar sorrindo. Uma caneca para acompanhar o café e mandar a romantização da exploração à merda.',
+   'O texto impresso foi retirado de um áudio atribuído a @beapozzebon no Instagram.'
+  ],
+  shippingPackage:{originPostalCode:'46875-000',weightGrams:400,lengthCm:11,widthCm:9.5,heightCm:9.5}
+ }]
 };
 export const images = ["/assets/images/293e93_55f842e76de94a9ba825225665d554e2~mv2.avif","/assets/images/293e93_97648ff6d1614638b32e9a9109842308~mv2.avif","/assets/images/293e93_e409d5324f0a499896b89df52ce860ec~mv2.avif","/assets/images/WhatsApp Image 2026-05-19 at 16_17_18 (2).avif","/assets/images/WhatsApp Image 2026-05-19 at 16_24_50 (2).avif","/assets/images/WhatsApp Image 2026-05-19 at 16_24_edited.avif","/assets/images/ai-generated-IMAGE.avif"];

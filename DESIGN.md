@@ -30,7 +30,7 @@ Use papel sobre vermelho, azul e preto; preto sobre amarelo. Não dependa apenas
 - Português brasileiro, direto, próximo e acolhedor. Crítica à produtividade, à opressão e ao yoga como símbolo de status.
 - Manifesto integral atribuído a Letícia. Não acrescentar alegações históricas ou científicas às chamadas.
 - A biografia e os dois artigos mantêm sua redação fornecida. As chamadas compartilhadas ficam em content.js.
-- A loja apresenta objetos para o cotidiano, sem prometer transformação ou bem-estar por meio do consumo. Manter explícito seu caráter demonstrativo.
+- A loja apresenta objetos para o cotidiano, sem prometer transformação ou bem-estar por meio do consumo. A caneca real está sem estoque; manter explícito que a lista de interesse não envolve pagamento nem garante unidade.
 
 ## Acessibilidade e verificação
 

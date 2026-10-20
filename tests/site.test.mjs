@@ -8,11 +8,10 @@ const root=new URL('../',import.meta.url);
 const paths=['/','/blog/','/lojinha/',...site.articles.map(a=>'/blog/'+a.slug+'/')];
 const source=(await readFile(new URL('app.js',root),'utf8')).replace(/^import[^\n]+\n/,'');
 const htmlFor=path=>readFile(new URL('.'+path+'index.html',root),'utf8');
-const brl=value=>value.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 
 // Um DOM mínimo verifica inicialização em páginas com componentes diferentes.
 // Layout, foco e renderização visual continuam exigindo um navegador real.
-function boot(html,storage={value:'{}'}){
+function boot(html){
  class Element{
   constructor(classes=''){this.hidden=false;this.value='';this.innerHTML='';this.textContent='';this.dataset={};this.attrs={};this.listeners={};this.classList={contains:c=>classes.split(' ').includes(c),add(){},remove(){},toggle(){}};}
   addEventListener(type,fn){this.listeners[type]=fn;}
@@ -23,41 +22,47 @@ function boot(html,storage={value:'{}'}){
  }
  const elements=new Map([...html.matchAll(/id="([^"]+)"/g)].map(m=>['#'+m[1],new Element()]));
  const menu=new Element();elements.set('.menu-toggle',menu);
- const selected=new Element();selected.value='18.90';elements.set('input[name="shipping"]:checked',selected);
  const groups={
   '[data-whatsapp]':[new Element()],'[data-group]':[new Element()],
   '[data-image]':[...html.matchAll(/data-image="(\d+)"/g)].map(m=>{const el=new Element();el.dataset.image=m[1];return el;}),'#navigation a':[],
-  'dialog':[elements.get('#cart-dialog')],
-  '[data-count]':[new Element()],'[data-cart]':[new Element('cart-trigger')],
-  'input[name="shipping"]':[new Element(),new Element()]
+
  };
  const document={
   body:{dataset:{basePath:html.match(/data-base-path="([^"]*)"/)?.[1]||''}},
   querySelector:s=>{if(!elements.has(s)&&s.startsWith('#')&&[...elements.values()].some(el=>el.innerHTML.includes('id="'+s.slice(1)+'"')))elements.set(s,new Element());return elements.get(s)||null;},
-  querySelectorAll:s=>s==='[data-add]'?(elements.has('#products')?site.products.map(p=>{const el=new Element();el.dataset.add=p.id;return el;}):[]):groups[s]||[],
+  querySelectorAll:s=>groups[s]||[],
   addEventListener(){}
  };
- // Capturar botões criados depois da renderização da vitrine.
- const findAll=document.querySelectorAll;let adds;
- document.querySelectorAll=s=>s==='[data-add]'?(adds??=findAll(s)):findAll(s);
- vm.runInNewContext(source,{document,site,images,localStorage:{getItem:()=>storage.value,setItem:(k,v)=>{storage.value=v;}},setTimeout:()=>0,clearTimeout(){},console});
- return {elements,groups,adds,get:s=>elements.get(s),storage};
+ vm.runInNewContext(source,{document,site,images,localStorage:new Proxy({}, {get(){throw new Error('O armazenamento antigo não deve ser acessado');}}),console});
+ return {elements,groups,get:s=>elements.get(s)};
 }
 
 test('todas as páginas inicializam sem depender de seções ausentes',async()=>{
- for(const path of paths){const html=await htmlFor(path);const view=boot(html);assert.match(html,/<html lang="pt-BR">/);assert.equal((html.match(/<h1[ >]/g)||[]).length,1);assert.ok(!html.includes('article-dialog'));assert.equal(view.get('#checkout').hidden,true);if(path==='/blog/'||path==='/')assert.match(view.get('#articles').innerHTML,/href="\/blog\/yoga-e-saude-mental\/"/);}
+ for(const path of paths){const html=await htmlFor(path);const view=boot(html);assert.match(html,/<html lang="pt-BR">/);assert.equal((html.match(/<h1[ >]/g)||[]).length,1);assert.ok(!html.includes('article-dialog'));assert.ok(!html.includes('id="checkout"'));if(path==='/blog/'||path==='/')assert.match(view.get('#articles').innerHTML,/href="\/blog\/yoga-e-saude-mental\/"/);}
 });
-test('carrinho persiste entre início, blog e loja; frete e resumo são demonstrativos',async()=>{
- const storage={value:'{}'};let view=boot(await htmlFor('/'),storage);
- view.adds[0].click();view.adds[0].click();view.adds[1].click();assert.deepEqual(JSON.parse(storage.value),{caneca:2,xicara:1});
- view=boot(await htmlFor('/blog/'),storage);assert.equal(view.groups['[data-count]'][0].textContent,3);assert.equal(view.get('#subtotal').textContent,brl(243));
- view=boot(await htmlFor('/lojinha/'),storage);view.groups['[data-cart]'][0].click();assert.equal(view.get('#cart-dialog').open,true);
- view.get('#cep').value='123';view.get('#shipping-form').listeners.submit({preventDefault(){}});assert.match(view.get('#shipping-error').textContent,/8 dígitos/);
- view.get('#cep').value='44000000';view.get('#cep').listeners.input();assert.equal(view.get('#cep').value,'44000-000');view.get('#shipping-form').listeners.submit({preventDefault(){}});assert.equal(view.get('#total').textContent,brl(261.9));
- view.get('#simulate').click();assert.match(view.get('#order-result').innerHTML,/Nenhum pedido foi criado/);assert.equal(view.get('#order-result').hidden,false);
- view.groups['[data-cart]'][0].click();view.get('#cep').listeners.input();assert.equal(view.get('#shipping-options').hidden,true);assert.equal(view.get('#total').textContent,brl(243));
- const change=dataset=>view.get('#cart-items').listeners.click({target:{closest:()=>({dataset})}});
- change({quantity:'caneca',change:'-1'});assert.equal(JSON.parse(storage.value).caneca,1);change({remove:'caneca'});change({remove:'xicara'});assert.equal(view.get('#checkout').hidden,true);assert.match(view.get('#cart-items').innerHTML,/href="\/lojinha\/"/);
+test('produto único real, lista de interesse e nenhum checkout ou acesso ao armazenamento',async()=>{
+ assert.equal(site.products.length,1);
+ const product=site.products[0];
+ assert.equal(product.name,'Caneca Capitalismo Depressão');assert.equal(product.price,70);
+ assert.deepEqual(product.shippingPackage,{originPostalCode:'46875-000',weightGrams:400,lengthCm:11,widthCm:9.5,heightCm:9.5});
+ for(const path of paths){
+  const html=await htmlFor(path);assert.doesNotMatch(html,/data-cart|data-add|cart-dialog|shipping-form|Simular pedido/);
+  boot(html);
+ }
+ for(const path of ['/','/lojinha/']){
+  const html=await htmlFor(path);
+  assert.ok(html.includes(product.image));assert.ok(html.includes('R$ 70,00'));assert.ok(html.includes('Sem estoque'));
+  for(const paragraph of product.description)assert.ok(html.includes(paragraph));
+  assert.match(html,/href="\/lojinha\/#lista-de-interesse"/);
+ }
+ const shop=await htmlFor('/lojinha/');assert.ok(shop.includes(site.interestForm.notice));assert.match(shop,/id="lista-de-interesse"/);
+ const publicUrl=new URL(site.interestForm.url);
+ const embeddedUrl=new URL(publicUrl);embeddedUrl.searchParams.set('embedded','true');
+ assert.ok(shop.includes('src="'+embeddedUrl.href.replaceAll('&','&amp;')+'"'));
+ assert.ok(shop.includes('href="'+publicUrl.href.replaceAll('&','&amp;')+'" target="_blank" rel="noopener noreferrer"'));
+ assert.match(shop,/Abrir formulário em outra aba/);assert.match(shop,/<iframe[^>]+title="Lista de interesse/);
+ assert.doesNotMatch(shop,/formulário da lista de interesse estará disponível em breve/);
+ assert.doesNotMatch(source,/localStorage|sessionStorage|respira-cart/);
 });
 test('artigos completos têm autoria, data e links para continuar lendo',async()=>{
  for(const article of site.articles){const html=await htmlFor('/blog/'+article.slug+'/');assert.ok(html.includes(article.title));assert.ok(html.includes(site.author));for(const paragraph of article.paragraphs)assert.ok(html.includes(paragraph.replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll("'",'&#39;')));assert.match(html,/Voltar ao blog/);assert.match(html,/CONTINUE A LEITURA/);}
@@ -106,16 +111,12 @@ test('pacote Pages usa o prefixo em HTML e elementos dinâmicos sem modificar o 
   const view=boot(html);
   for(const match of html.matchAll(/(?:href|src)="([^"]*)"/g))await checkTarget(match[1]);
   for(const img of view.groups['[data-image]'])await checkTarget(img.src);
-  for(const selector of ['#articles','#products','#cart-items']){
+  for(const selector of ['#articles','#products']){
    const rendered=view.get(selector)?.innerHTML||'';
    for(const match of rendered.matchAll(/(?:href|src)="([^"]*)"/g))await checkTarget(match[1]);
   }
   assert.equal(view.groups['[data-whatsapp]'][0].href,site.whatsapp);
   assert.equal(view.groups['[data-group]'][0].href,site.group);
  }
- const storage={value:'{}'};
- boot(await readFile(new URL('dist/index.html',root),'utf8'),storage).adds[0].click();
- const shop=boot(await readFile(new URL('dist/lojinha/index.html',root),'utf8'),storage);
- assert.equal(shop.groups['[data-count]'][0].textContent,1);
- for(const match of shop.get('#cart-items').innerHTML.matchAll(/src="([^"]*)"/g))await checkTarget(match[1]);
+
 });
