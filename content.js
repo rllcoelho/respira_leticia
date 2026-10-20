@@ -3,6 +3,61 @@ export const site = {
  whatsapp: 'https://wa.me/5575981935364?text=Bom+tarde%2C+L%C3%AA%2C+vim+do+seu+perfil+do+instagram',
  group: 'https://chat.whatsapp.com/CXplb4wsGpy844QkqMFNoX?mode=gi_t',
  author: 'Letícia Gabrieli Queiroz Andrade',
+ copy: {
+  "hero": {
+    "kicker": "YOGA · CORPO · AUTONOMIA",
+    "title": "Seu corpo não é uma máquina.",
+    "description": "Uma prática de corpo, presença e autonomia. Para quem quer se mover, se escutar e construir outras formas de estar no mundo.",
+    "note": "O corpo tem voz. A prática tem posição.",
+    "caption": "Prática cotidiana. Corpo de verdade."
+  },
+  "about": {
+    "kicker": "PRAZER, SOU LETÍCIA",
+    "title": "Da Bahia, uma prática com os pés na vida.",
+    "caption": "Letícia. Professora de yoga. Interior da Bahia."
+  },
+  "blog": {
+    "kicker": "IDEIAS EM MOVIMENTO",
+    "title": "Corpo, cotidiano e pensamento crítico.",
+    "description": "Textos para pensar a prática e a vida que acontece fora do tapete."
+  },
+  "community": {
+    "kicker": "CORPO PRESENTE. CONSTRUÇÃO COLETIVA.",
+    "title": "A prática também se constrói em coletivo.",
+    "description": "Entre no grupo de WhatsApp e se aproxime da comunidade de yoga com Letícia.",
+    "action": "Entrar no grupo",
+    "note": "Você pode chegar como está."
+  },
+  "shop": {
+    "kicker": "OBJETOS DO DIA A DIA",
+    "title": "Canecas e cerâmicas para o cotidiano.",
+    "description": "Conheça as peças da vitrine e explore as formas, os usos e os materiais.",
+    "catalogNote": "Vitrine demonstrativa. Produtos e preços de exemplo."
+  },
+  "closing": {
+    "title": "Seu corpo tem voz.",
+    "description": "Vamos construir essa prática juntos?",
+    "action": "Marcar uma aula"
+  },
+  "footer": {
+    "tagline": "Yoga, autonomia e resistência.",
+    "location": "Da Bahia, para a vida concreta."
+  },
+  "cart": {
+    "kicker": "VITRINE DEMONSTRATIVA",
+    "emptyTitle": "Seu carrinho está vazio.",
+    "summaryTitle": "Resumo da simulação."
+  }
+},
+ manifesto: {
+  "title": "Yoga também é resistência.",
+  "paragraphs": [
+    "O yoga sempre foi símbolo de revolta, mas quando a gente vê essa imagem de yoga pasteurizado, de roupa bege, tapetinho de quatrocentos a mil reais, é óbvio que a gente não vê essa prática que representa a revolta.",
+    "O Ocidente pegou uma tecnologia ancestral de ruptura, de desconstrução, de liberdade, de radicalismo, e empacotou nesse produto de bem-estar.",
+    "O yoga raiz nunca foi sobre você ficar zen, sobre conseguir render mais na escala 6x1. A filosofia do yoga é uma prática de desidentificação total da estrutura. É um ato político. É um ato de não se curvar às estruturas de opressão, principalmente lá atrás no início do yoga.",
+    "É sobre treinar a mente para ser ingovernável pelo sistema. Só que o capitalismo é mestre em domesticar o que é subversivo, e aí transformaram essa ferramenta em mais um produto para lucro, mas resistiremos!"
+  ]
+},
  bio: [
  'Sou Letícia, professora de yoga, nascida no interior da Bahia, onde o café forte e o silêncio ainda fazem parte da vida.',
  'O yoga entrou na minha rotina num momento em que eu já estava cansada de viver no automático, tentando dar conta de tudo o tempo inteiro. Aos poucos, a prática me mostrou que muitas vezes o corpo não está apenas cansado. Ele está pressionado, acelerado e distante de si mesmo.',
@@ -24,6 +79,6 @@ export const site = {
  'Isso não significa "corrigir a postura" ou encontrar uma posição perfeita para o corpo. O principal benefício parece estar na ampliação do repertório de movimentos e na interrupção de períodos prolongados de imobilidade.',
  'Para quem passa o dia sentado, o yoga pode funcionar como um momento de movimento deliberado em uma rotina marcada pela permanência na mesma posição.'
  ]}],
- products:[{id:'caneca',name:'Caneca Aurora',note:'Um convite para saborear a pausa.',price:89,image:'/assets/illustrations/caneca.svg'}, {id:'xicara',name:'Xícara Terra',note:'Para os pequenos rituais do dia.',price:65,image:'/assets/illustrations/xicara.svg'}, {id:'vaso',name:'Vaso Essência',note:'Um pouco de natureza por perto.',price:110,image:'/assets/illustrations/vaso.svg'}]
+ products:[{id:'caneca',name:'Caneca Aurora',note:'Caneca ilustrativa em dois tons.',price:89,image:'/assets/illustrations/caneca.svg'}, {id:'xicara',name:'Xícara Terra',note:'Xícara ilustrativa com pires.',price:65,image:'/assets/illustrations/xicara.svg'}, {id:'vaso',name:'Vaso Essência',note:'Vaso ilustrativo de formato arredondado.',price:110,image:'/assets/illustrations/vaso.svg'}]
 };
 export const images = ["/assets/images/293e93_55f842e76de94a9ba825225665d554e2~mv2.avif","/assets/images/293e93_97648ff6d1614638b32e9a9109842308~mv2.avif","/assets/images/293e93_e409d5324f0a499896b89df52ce860ec~mv2.avif","/assets/images/WhatsApp Image 2026-05-19 at 16_17_18 (2).avif","/assets/images/WhatsApp Image 2026-05-19 at 16_24_50 (2).avif","/assets/images/WhatsApp Image 2026-05-19 at 16_24_edited.avif","/assets/images/ai-generated-IMAGE.avif"];

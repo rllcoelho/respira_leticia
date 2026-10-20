@@ -7,6 +7,7 @@
     "start": "node server.mjs",
     "check": "node --check app.js && node --check content.js && node --check server.mjs && node --check build.mjs",
     "build": "node build.mjs",
-    "test": "node --test tests/site.test.mjs"
+    "test": "node --test tests/site.test.mjs",
+    "build:pages": "node build.mjs --pages"
   }
 }

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFile} from 'node:fs/promises';
-import {spawn} from 'node:child_process';
+import {readFile,readdir,stat} from 'node:fs/promises';
+import {spawn,execFileSync} from 'node:child_process';
 import vm from 'node:vm';
 import {site,images} from '../content.js';
 const root=new URL('../',import.meta.url);
@@ -26,12 +26,13 @@ function boot(html,storage={value:'{}'}){
  const selected=new Element();selected.value='18.90';elements.set('input[name="shipping"]:checked',selected);
  const groups={
   '[data-whatsapp]':[new Element()],'[data-group]':[new Element()],
-  '[data-image]':[],'#navigation a':[],
+  '[data-image]':[...html.matchAll(/data-image="(\d+)"/g)].map(m=>{const el=new Element();el.dataset.image=m[1];return el;}),'#navigation a':[],
   'dialog':[elements.get('#cart-dialog')],
   '[data-count]':[new Element()],'[data-cart]':[new Element('cart-trigger')],
   'input[name="shipping"]':[new Element(),new Element()]
  };
  const document={
+  body:{dataset:{basePath:html.match(/data-base-path="([^"]*)"/)?.[1]||''}},
   querySelector:s=>{if(!elements.has(s)&&s.startsWith('#')&&[...elements.values()].some(el=>el.innerHTML.includes('id="'+s.slice(1)+'"')))elements.set(s,new Element());return elements.get(s)||null;},
   querySelectorAll:s=>s==='[data-add]'?(elements.has('#products')?site.products.map(p=>{const el=new Element();el.dataset.add=p.id;return el;}):[]):groups[s]||[],
   addEventListener(){}
@@ -71,4 +72,50 @@ test('servidor atende páginas, assets, links internos e redirecionamentos',asyn
   for(const path of paths.filter(p=>p!=='/')){const response=await fetch(origin+path.slice(0,-1)+'?teste=1',{redirect:'manual'});assert.equal(response.status,308);assert.equal(response.headers.get('location'),path+'?teste=1');}
   assert.equal((await fetch(origin+'/pagina-inexistente/')).status,404);
  }finally{child.kill();}
+});
+
+test('manifesto integral é publicado com autoria e chamadas resolvidas',async()=>{
+ const expected="O yoga sempre foi símbolo de revolta, mas quando a gente vê essa imagem de yoga pasteurizado, de roupa bege, tapetinho de quatrocentos a mil reais, é óbvio que a gente não vê essa prática que representa a revolta. O Ocidente pegou uma tecnologia ancestral de ruptura, de desconstrução, de liberdade, de radicalismo, e empacotou nesse produto de bem-estar. O yoga raiz nunca foi sobre você ficar zen, sobre conseguir render mais na escala 6x1. A filosofia do yoga é uma prática de desidentificação total da estrutura. É um ato político. É um ato de não se curvar às estruturas de opressão, principalmente lá atrás no início do yoga. É sobre treinar a mente para ser ingovernável pelo sistema. Só que o capitalismo é mestre em domesticar o que é subversivo, e aí transformaram essa ferramenta em mais um produto para lucro, mas resistiremos!";
+ assert.equal(site.manifesto.paragraphs.join(' '),expected);
+ const home=await htmlFor('/');
+ assert.match(home,/id="manifesto"/);assert.ok(home.includes(site.manifesto.title));
+ for(const paragraph of site.manifesto.paragraphs)assert.ok(home.includes(paragraph));
+ assert.ok(home.includes('Por '+site.author));assert.ok(home.includes(site.copy.hero.title));
+ for(const path of paths){const html=await htmlFor(path);assert.ok(!html.includes('{{'),path);assert.ok(html.includes('href="/#manifesto"'),path);}
+});
+
+test('pacote Pages usa o prefixo em HTML e elementos dinâmicos sem modificar o site local',async()=>{
+ const before=await Promise.all(paths.map(htmlFor));
+ execFileSync(process.execPath,['build.mjs','--pages'],{cwd:root,env:{...process.env,SITE_BASE_PATH:'/respira_leticia'}});
+ assert.deepEqual(await Promise.all(paths.map(htmlFor)),before);
+ const prefix='/respira_leticia';
+ const publicFiles=await readdir(new URL('dist/',root));
+ assert.deepEqual(publicFiles.sort(),['.nojekyll','app.js','assets','blog','content.js','index.html','lojinha','styles.css'].sort());
+ const checkTarget=async target=>{
+  if(target.startsWith('#'))return;
+  const url=new URL(target,'https://example.test');
+  if(url.origin!=='https://example.test')return;
+  assert.ok(url.pathname.startsWith(prefix+'/'),target);
+  let path=decodeURIComponent(url.pathname.slice(prefix.length));
+  if(path.endsWith('/'))path+='index.html';
+  assert.ok((await stat(new URL('dist'+path,root))).isFile(),target);
+ };
+ for(const path of paths){
+  const html=await readFile(new URL('dist'+path+'index.html',root),'utf8');
+  assert.ok(html.includes('data-base-path="'+prefix+'"'));
+  const view=boot(html);
+  for(const match of html.matchAll(/(?:href|src)="([^"]*)"/g))await checkTarget(match[1]);
+  for(const img of view.groups['[data-image]'])await checkTarget(img.src);
+  for(const selector of ['#articles','#products','#cart-items']){
+   const rendered=view.get(selector)?.innerHTML||'';
+   for(const match of rendered.matchAll(/(?:href|src)="([^"]*)"/g))await checkTarget(match[1]);
+  }
+  assert.equal(view.groups['[data-whatsapp]'][0].href,site.whatsapp);
+  assert.equal(view.groups['[data-group]'][0].href,site.group);
+ }
+ const storage={value:'{}'};
+ boot(await readFile(new URL('dist/index.html',root),'utf8'),storage).adds[0].click();
+ const shop=boot(await readFile(new URL('dist/lojinha/index.html',root),'utf8'),storage);
+ assert.equal(shop.groups['[data-count]'][0].textContent,1);
+ for(const match of shop.get('#cart-items').innerHTML.matchAll(/src="([^"]*)"/g))await checkTarget(match[1]);
 });
